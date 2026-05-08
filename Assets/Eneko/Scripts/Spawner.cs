@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    public GameObject projectil; // Solo necesitas un prefab ahora
+    public GameObject projectil; // Prefab del proyectil con ProyectilMR
     public float bombProbability = 0.3f;
     public List<GameObject> pool = new List<GameObject>();
 
@@ -16,13 +16,30 @@ public class Spawner : MonoBehaviour
     public float minSpawnTime = 2f;
     public float maxSpawnTime = 3f;
 
-
     private int poolSize = 10;
     private float cooldown = 0;
     private float nextSpawnTime;
 
     void Start()
     {
+        // Verificar que el prefab tiene el componente correcto
+        if (projectil != null)
+        {
+            ProyectilMR proyectilComponent = projectil.GetComponent<ProyectilMR>();
+            if (proyectilComponent == null)
+            {
+                Debug.LogError(" El prefab de proyectil NO tiene el componente ProyectilMR. Por favor aniadelo.");
+            }
+            else
+            {
+                Debug.Log(" Spawner configurado correctamente con ProyectilMR");
+            }
+        }
+        else
+        {
+            Debug.LogError(" No hay prefab asignado en el Spawner!");
+        }
+
         AddProyectil(poolSize);
         nextSpawnTime = Random.Range(minSpawnTime, maxSpawnTime);
     }
@@ -60,11 +77,24 @@ public class Spawner : MonoBehaviour
             {
                 pool[i].transform.position = origin;
                 pool[i].SetActive(true);
-                pool[i].GetComponent<Proyectil>().Launch(destinationOffsetRange, isBomb, speed);
+
+                // CAMBIO IMPORTANTE: Usar ProyectilMR en vez de Proyectil
+                ProyectilMR proyectilComponent = pool[i].GetComponent<ProyectilMR>();
+
+                if (proyectilComponent != null)
+                {
+                    proyectilComponent.Launch(destinationOffsetRange, isBomb, speed);
+                }
+                else
+                {
+                    Debug.LogError($" El proyectil {pool[i].name} no tiene el componente ProyectilMR!");
+                }
+
                 return;
             }
         }
 
+        // Si no hay proyectiles disponibles, crear uno nuevo
         AddProyectil(1);
         ShootProyectil(origin);
     }
@@ -72,6 +102,13 @@ public class Spawner : MonoBehaviour
     Vector3 OriginPoint()
     {
         Transform cam = Camera.main.transform;
+
+        if (cam == null)
+        {
+            Debug.LogError(" No se encuentra Main Camera!");
+            return Vector3.zero;
+        }
+
         Vector3 spawnPos = cam.position + cam.forward * spawnDistance;
         spawnPos.y = 1.5f;
         return spawnPos;

@@ -12,9 +12,8 @@ GameObject:
   - component: {fileID: 8231115926516049554}
   - component: {fileID: 6048427271843851136}
   - component: {fileID: 7563160082830179772}
-  - component: {fileID: 8468114780825073949}
   - component: {fileID: 4870454849577222554}
-  - component: {fileID: 4409071045706391223}
+  - component: {fileID: 4745349686754976275}
   m_Layer: 0
   m_Name: Proyectil
   m_TagString: Untagged
@@ -111,21 +110,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8468114780825073949
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6195422053036814735}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 343292c14c339e244b564d855e65b229, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxLifeTime: 10
-  normalColor: {r: 0, g: 0, b: 1, a: 1}
-  bombColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &4870454849577222554
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,7 +182,7 @@ MonoBehaviour:
   m_StartingHoverFilters: []
   m_StartingSelectFilters: []
   m_StartingInteractionStrengthFilters: []
---- !u!114 &4409071045706391223
+--- !u!114 &4745349686754976275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -207,9 +191,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6195422053036814735}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fe572e1f23460e419787e07a7fe1bce, type: 3}
+  m_Script: {fileID: 11500000, guid: d0f5d4d419cea234f85ba33b5eebfe7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  touchedColor: {r: 0, g: 1, b: 0, a: 1}
-  restoreWhenHandLeaves: 1
-  targetRenderer: {fileID: 0}
+  maxLifeTime: 5
+  normalColor: {r: 0, g: 0, b: 1, a: 1}
+  bombColor: {r: 1, g: 0, b: 0, a: 1}
