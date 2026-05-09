@@ -18,57 +18,25 @@ public class ProyectilMR : MonoBehaviour
     public Color normalColor = Color.blue;
     public Color bombColor = Color.red;
 
-    // Sistema de interacción XR
+    // Sistema de interaccion XR
     private XRSimpleInteractable interactable;
     private bool hasBeenHit = false;
 
     private void Awake()
     {
-        // Buscar EndPoint con protección contra null
+        // Obtener XRSimpleInteractable (debe estar en el GameObject)
+        interactable = GetComponent<XRSimpleInteractable>();
+
         if (EndPoint.Instance != null)
         {
             end = EndPoint.Instance.transform;
         }
-        else
-        {
-            Debug.LogWarning(" EndPoint.Instance no encontrado. Buscando por tipo...");
-            EndPoint endPoint = FindAnyObjectByType<EndPoint>();
-            if (endPoint != null)
-            {
-                end = endPoint.transform;
-                Debug.Log(" EndPoint encontrado por busqueda");
-            }
-            else
-            {
-                Debug.LogError(" No se encuentra EndPoint en la escena. Por favor añade un GameObject con el script EndPoint.");
-            }
-        }
 
-        // Buscar Counter con protección contra null
+        // Buscar Counter
         counter = FindAnyObjectByType<Counter>();
-        if (counter == null)
-        {
-            Debug.LogError(" No se encuentra Counter en la escena. Por favor aniade un GameObject con el script Counter.");
-        }
-        else
-        {
-            Debug.Log(" Counter encontrado");
-        }
 
         // Obtener Renderer
         proyectilRenderer = GetComponent<Renderer>();
-        if (proyectilRenderer == null)
-        {
-            Debug.LogWarning(" Este proyectil no tiene Renderer. No se podran cambiar los colores.");
-        }
-
-        // Obtener o agregar el componente XRSimpleInteractable
-        interactable = GetComponent<XRSimpleInteractable>();
-        if (interactable == null)
-        {
-            interactable = gameObject.AddComponent<XRSimpleInteractable>();
-            Debug.Log(" XRSimpleInteractable aniadido automaticamente");
-        }
     }
 
     private void OnEnable()
@@ -78,7 +46,8 @@ public class ProyectilMR : MonoBehaviour
         // Suscribirse a los eventos de hover
         if (interactable != null)
         {
-            interactable.hoverEntered.AddListener(OnHandTouch);
+            interactable.hoverEntered.AddListener(OnHoverEntered);
+            interactable.hoverExited.AddListener(OnHoverExited);
         }
     }
 
@@ -87,7 +56,8 @@ public class ProyectilMR : MonoBehaviour
         // Desuscribirse de los eventos
         if (interactable != null)
         {
-            interactable.hoverEntered.RemoveListener(OnHandTouch);
+            interactable.hoverEntered.RemoveListener(OnHoverEntered);
+            interactable.hoverExited.RemoveListener(OnHoverExited);
         }
     }
 
@@ -98,22 +68,13 @@ public class ProyectilMR : MonoBehaviour
         isBomb = bomb;
         hasBeenHit = false;
 
-        // Cambiar color según tipo
+        // Cambiar color segun tipo
         if (proyectilRenderer != null)
         {
             proyectilRenderer.material.color = isBomb ? bombColor : normalColor;
         }
 
-        // Verificar que tenemos un punto de destino
-        if (end == null)
-        {
-            Debug.LogError(" No hay EndPoint configurado. El proyectil no puede calcular dirección.");
-            // Dirección por defecto: hacia adelante de la cámara
-            direction = Camera.main != null ? Camera.main.transform.forward : Vector3.forward;
-            return;
-        }
-
-        // Calcular dirección con offset aleatorio
+        // Calcular direccion con offset aleatorio
         float offset = Random.Range(-destinationOffsetRange, destinationOffsetRange);
         Vector3 targetPos = new Vector3(end.position.x + offset, end.position.y, end.position.z);
         direction = (targetPos - transform.position).normalized;
@@ -137,36 +98,30 @@ public class ProyectilMR : MonoBehaviour
         }
     }
 
-    // Este método se llama cuando una mano toca el proyectil
-    private void OnHandTouch(HoverEnterEventArgs args)
+    private void OnHoverEntered(HoverEnterEventArgs args)
     {
-        if (hasBeenHit) return; // Evitar múltiples hits
+        if (hasBeenHit) return; // Evitar multiples hits
 
         hasBeenHit = true;
-
-        // Verificar que tenemos contador
-        if (counter == null)
-        {
-            Debug.LogError("❌ No hay Counter disponible para actualizar puntos!");
-            gameObject.SetActive(false);
-            return;
-        }
 
         if (isBomb)
         {
             // Las bombas restan 1 punto
             counter.counter--;
-            Debug.Log(" ¡Bomba golpeada! -1 punto. Total: " + counter.counter);
         }
         else
         {
             // Proyectil normal suma 1 punto
             counter.counter++;
-            Debug.Log(" ¡Proyectil golpeado! +1 punto. Total: " + counter.counter);
         }
 
         // Desactivar el proyectil
         gameObject.SetActive(false);
+    }
+
+    private void OnHoverExited(HoverExitEventArgs args)
+    {
+        // Este evento se dispara cuando la mano deja de tocar el proyectil
     }
 
     public bool IsBomb()

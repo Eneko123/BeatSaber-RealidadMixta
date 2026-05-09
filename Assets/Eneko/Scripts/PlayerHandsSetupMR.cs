@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
 
 public class PlayerHandsSetupMR : MonoBehaviour
 {
@@ -6,14 +7,17 @@ public class PlayerHandsSetupMR : MonoBehaviour
     public GameObject leftHand;
     public GameObject rightHand;
 
-    [Header("Configuracion")]
+    [Header("Configuración")]
     public bool useGameConfig = true;
+
+    [Header("Interaction Layer")]
+    public string interactionLayerName = "HandTouch";
 
     private void Start()
     {
         SetupHands();
 
-        // Resetear posicion del jugador
+        // Resetear posición del jugador
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
     }
@@ -22,7 +26,7 @@ public class PlayerHandsSetupMR : MonoBehaviour
     {
         if (useGameConfig)
         {
-            // Configurar segun GameConfig
+            // Configurar según GameConfig
             if (leftHand != null)
             {
                 leftHand.SetActive(GameConfig.leftSableActive);
@@ -35,37 +39,16 @@ public class PlayerHandsSetupMR : MonoBehaviour
                 Debug.Log($"Mano derecha: {(GameConfig.rightSableActive ? "Activada" : "Desactivada")}");
             }
         }
-
-        // Verificar que las manos tienen los componentes necesarios
-        VerifyHandComponents(leftHand, "Izquierda");
-        VerifyHandComponents(rightHand, "Derecha");
     }
 
-    void VerifyHandComponents(GameObject hand, string handName)
-    {
-        if (hand == null) return;
-
-        // El XR Origin Hands ya viene con XRDirectInteractor
-        // Solo verificamos que este presente
-        var interactor = hand.GetComponentInChildren<UnityEngine.XR.Interaction.Toolkit.Interactors.XRDirectInteractor>();
-
-        if (interactor != null)
-        {
-            Debug.Log($"Mano {handName} configurada correctamente con XRDirectInteractor");
-        }
-        else
-        {
-            Debug.LogWarning($"Mano {handName} no tiene XRDirectInteractor. Verifica la configuracion del XR Origin Hands.");
-        }
-    }
-
-    // Metodo para activar/desactivar manos en runtime
+    // Metodos para activar/desactivar manos en runtime
     public void SetLeftHandActive(bool active)
     {
         if (leftHand != null)
         {
             leftHand.SetActive(active);
             GameConfig.leftSableActive = active;
+            Debug.Log($"Mano izquierda: {(active ? "Activada" : "Desactivada")}");
         }
     }
 
@@ -75,6 +58,7 @@ public class PlayerHandsSetupMR : MonoBehaviour
         {
             rightHand.SetActive(active);
             GameConfig.rightSableActive = active;
+            Debug.Log($"Mano derecha: {(active ? "Activada" : "Desactivada")}");
         }
     }
 }
